@@ -34,6 +34,7 @@ jest.mock('next/link', () => ({
 beforeEach(() => {
   mockQuery.q = 'tools';
   global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
     json: async () => ({
       data: {
         searchProducts: [
@@ -65,5 +66,13 @@ describe('SearchPage', () => {
     expect(getByText('Tools')).toBeTruthy();
     expect(getByText('Safety Equipment')).toBeTruthy();
     expect(getByRole('heading', { name: 'Safety Helmet EN397' })).toBeTruthy();
+  });
+
+  it('stops loading and shows "No products found." when the request fails', async () => {
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('network down'));
+    const { getByText, queryByText } = render(<SearchPage />);
+
+    await waitFor(() => expect(getByText('No products found.')).toBeTruthy());
+    expect(queryByText('Loading...')).toBeFalsy();
   });
 });

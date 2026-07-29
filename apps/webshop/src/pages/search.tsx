@@ -2,12 +2,29 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { groupBy } from '../utils/groupBy';
 import ProductCard from '../components/ProductCard';
+import { fetchGraphQL } from '../utils/fetchGraphQL';
+import { Product } from '../types';
 import styles from './search.module.css';
+
+const SEARCH_PRODUCTS_QUERY = `
+  query SearchProducts($q: String!) {
+    searchProducts(query: $q) {
+      id
+      name
+      price
+      imageUrl
+      category
+      description
+      stock
+      createdAt
+    }
+  }
+`;
 
 export default function SearchPage() {
   const router = useRouter();
-  const [results, setResults] = useState<any[]>([]);
-  const [filteredResults, setFilteredResults] = useState<any[]>([]);
+  const [results, setResults] = useState<Product[]>([]);
+  const [filteredResults, setFilteredResults] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -15,31 +32,14 @@ export default function SearchPage() {
 
     setIsLoading(true);
 
-    fetch('http://localhost:4000/graphql', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
-          query SearchProducts($q: String!) {
-            searchProducts(query: $q) {
-              id
-              name
-              price
-              imageUrl
-              category
-              description
-              stock
-              createdAt
-            }
-          }
-        `,
-        variables: { q },
-      }),
-    })
-      .then(res => res.json())
+    fetchGraphQL<{ searchProducts: Product[] }>(SEARCH_PRODUCTS_QUERY, { q })
       .then(data => {
         console.log('search results:', data);
-        setResults(data.data.searchProducts);
+        setResults(data.searchProducts);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('search failed:', err);
         setIsLoading(false);
       });
   }, []);
