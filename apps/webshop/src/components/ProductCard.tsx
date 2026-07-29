@@ -1,10 +1,8 @@
 import React from 'react';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import styles from './ProductCard.module.css';
 
 const ProductCard: React.FC<any> = ({ product, onAddToCart }) => {
-  const router = useRouter();
-
   return (
     <div
       className={styles.card}
@@ -20,12 +18,9 @@ const ProductCard: React.FC<any> = ({ product, onAddToCart }) => {
       <div className={styles.body}>
         <h3 className={styles.name}>{product.name}</h3>
         <p className={styles.price} data-testid="product-price">€{product.price.toFixed(2)}</p>
-        <div
-          onClick={() => router.push(`/product/${product.id}`)}
-          className={styles.button}
-        >
+        <Link href={`/product/${product.id}`} className={styles.button}>
           View product
-        </div>
+        </Link>
       </div>
     </div>
   );

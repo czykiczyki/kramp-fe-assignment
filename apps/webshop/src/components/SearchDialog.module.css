@@ -19,6 +19,8 @@
   padding: 10px 14px;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0;
+  text-decoration: none;
+  color: inherit;
 }
 
 .item:hover {
@@ -27,6 +29,11 @@
 
 .item:last-child {
   border-bottom: none;
+}
+
+.item:focus-visible {
+  outline: 2px solid #e63329;
+  outline-offset: -2px;
 }
 
 .itemName {

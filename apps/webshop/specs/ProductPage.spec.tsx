@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor, act } from '@testing-library/react';
+import { render, waitFor, act, fireEvent } from '@testing-library/react';
 import ProductPage from '../src/pages/product/[id]';
 import { CartContext } from '../src/pages/_app';
 
@@ -137,4 +137,19 @@ it('shows a loading state while refetching after an id change, instead of stale 
     await Promise.resolve();
   });
   await waitFor(() => expect(getByText('Product 4')).toBeTruthy());
+});
+
+it('renders "Add to cart" as an accessible button and adds the loaded product to the cart', async () => {
+  const cartValue = { cart: [], addToCart: jest.fn(), totalItems: 0 };
+  const { getByRole } = renderProductPage(cartValue);
+  await waitFor(() => expect(getByRole('button', { name: 'Add to cart' })).toBeTruthy());
+
+  fireEvent.click(getByRole('button', { name: 'Add to cart' }));
+
+  expect(cartValue.addToCart).toHaveBeenCalledWith({
+    productId: '1',
+    name: 'Product 1',
+    price: 10,
+    quantity: 1,
+  });
 });

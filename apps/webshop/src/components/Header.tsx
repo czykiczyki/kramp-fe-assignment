@@ -126,8 +126,7 @@ export function Header() {
           {isOpen && (
             <SearchDialog
               results={results}
-              onSelect={(id: string) => {
-                router.push(`/product/${id}`);
+              onSelect={() => {
                 setIsOpen(false);
                 setQuery('');
               }}

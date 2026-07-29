@@ -5,10 +5,17 @@
   cursor: pointer;
   padding: 8px 12px;
   margin-left: 16px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .cartIcon:hover {
   opacity: 0.8;
+}
+
+.cartIcon:focus-visible {
+  outline: 2px solid #e63329;
+  outline-offset: 2px;
 }
 
 .label {
