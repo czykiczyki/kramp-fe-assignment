@@ -16,13 +16,14 @@ export function Header() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const debouncedQuery = useDebounce(query, 300);
 
   useEffect(() => {
     setIsOpen(results.length > 0);
   }, [results]);
 
   useEffect(() => {
-    if (!query) {
+    if (!debouncedQuery) {
       setResults([]);
       return;
     }
@@ -44,14 +45,14 @@ export function Header() {
             }
           }
         `,
-        variables: { q: query },
+        variables: { q: debouncedQuery },
       }),
     })
       .then(res => res.json())
       .then(data => {
         setResults(data.data.searchProducts.slice(0, 5));
       });
-  }, [query]);
+  }, [debouncedQuery]);
 
   useEffect(() => {
     const handleOutsideClick = () => {
