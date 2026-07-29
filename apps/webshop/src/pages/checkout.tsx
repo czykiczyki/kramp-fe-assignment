@@ -47,7 +47,12 @@ export default function CheckoutPage() {
             <Link href="/" className={styles.continueLink}>Continue shopping</Link>
           </div>
         ) : (
-          <>
+          <form
+            onSubmit={e => {
+              e.preventDefault();
+              handlePlaceOrder();
+            }}
+          >
             <div className={styles.items}>
               {items.map((item: any, index: number) => (
                 <div key={index} className={styles.item}>
@@ -72,15 +77,12 @@ export default function CheckoutPage() {
             </div>
 
             <div className={styles.actions}>
-              <div
-                className={styles.placeOrderButton}
-                onClick={handlePlaceOrder}
-              >
+              <button type="submit" className={styles.placeOrderButton}>
                 Place order
-              </div>
+              </button>
               <Link href="/" className={styles.continueLink}>Continue shopping</Link>
             </div>
-          </>
+          </form>
         )}
       </div>
     </div>

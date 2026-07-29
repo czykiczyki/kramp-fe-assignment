@@ -1,14 +1,14 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import ProductCard from '../src/components/ProductCard';
 
-jest.mock('next/router', () => ({
-  useRouter: () => ({
-    push: jest.fn(),
-    pathname: '/',
-    query: {},
-    asPath: '/',
-  }),
+jest.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ children, href, className }: any) => (
+    <a href={href} className={className}>
+      {children}
+    </a>
+  ),
 }));
 
 const mockProduct = {
@@ -36,5 +36,11 @@ describe('ProductCard', () => {
   it('renders the product name', () => {
     const { getByTestId } = render(<ProductCard product={mockProduct} />);
     expect(getByTestId('product-card').textContent).toContain('Heavy Duty Hammer');
+  });
+
+  it('renders "View product" as an accessible link to the product page', () => {
+    const { getByRole } = render(<ProductCard product={mockProduct} />);
+    const link = getByRole('link', { name: 'View product' });
+    expect(link.getAttribute('href')).toBe('/product/1');
   });
 });

@@ -77,6 +77,7 @@
 
 .placeOrderButton {
   display: block;
+  width: 100%;
   background: #e63329;
   color: white;
   padding: 14px;
@@ -85,10 +86,17 @@
   text-align: center;
   cursor: pointer;
   border-radius: 4px;
+  border: none;
+  font-family: inherit;
 }
 
 .placeOrderButton:hover {
   background: #c42820;
+}
+
+.placeOrderButton:focus-visible {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 2px;
 }
 
 .continueLink {
