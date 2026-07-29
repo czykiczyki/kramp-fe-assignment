@@ -12,6 +12,8 @@ export default function ProductPage() {
   useEffect(() => {
     if (!router.query.id) return;
 
+    setProduct(null);
+
     fetch(GRAPHQL_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -38,7 +40,7 @@ export default function ProductPage() {
         console.log('product loaded:', data);
         setProduct(data.data.product);
       });
-  }, [cart]);
+  }, [router.query.id]);
 
   const handleAddToCart = () => {
     if (!product) return;
