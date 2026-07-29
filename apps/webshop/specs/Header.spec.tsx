@@ -36,6 +36,7 @@ function renderHeader() {
 beforeEach(() => {
   jest.useFakeTimers();
   global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
     json: async () => ({ data: { searchProducts: [] } }),
   }) as jest.Mock;
 });
@@ -68,6 +69,7 @@ describe('Header search debounce', () => {
 
   it('clears results after the delay when the query is cleared', async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
       json: async () => ({
         data: { searchProducts: [{ id: '1', name: 'Hammer', price: 9.99 }] },
       }),
@@ -106,6 +108,23 @@ describe('Header search debounce', () => {
     expect(body.variables.q).toBe('hammer');
   });
 
+  it('does not crash and shows no results dropdown when the search request fails', async () => {
+    (global.fetch as jest.Mock).mockRejectedValue(new Error('network down'));
+    const { getByPlaceholderText, container } = renderHeader();
+    const input = getByPlaceholderText('Search products...');
+
+    fireEvent.change(input, { target: { value: 'hammer' } });
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(container.querySelector('a[href^="/product/"]')).toBeNull();
+  });
+
   it('ignores a stale response that resolves after a newer one', async () => {
     function createDeferred<T>() {
       let resolve!: (value: T) => void;
@@ -140,6 +159,7 @@ describe('Header search debounce', () => {
     // The newer request ("hammer") resolves first.
     await act(async () => {
       second.resolve({
+        ok: true,
         json: async () => ({
           data: { searchProducts: [{ id: '2', name: 'Hammer Drill', price: 59 }] },
         }),
@@ -151,6 +171,7 @@ describe('Header search debounce', () => {
     // The older request ("ha") resolves later — its response must be ignored.
     await act(async () => {
       first.resolve({
+        ok: true,
         json: async () => ({
           data: { searchProducts: [{ id: '3', name: 'Hand Saw', price: 12 }] },
         }),

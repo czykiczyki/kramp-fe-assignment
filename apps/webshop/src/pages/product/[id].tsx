@@ -1,44 +1,41 @@
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { CartContext } from '../_app';
+import { fetchGraphQL } from '../../utils/fetchGraphQL';
+import { Product } from '../../types';
 import styles from './[id].module.css';
 
-var GRAPHQL_URL = 'http://localhost:4000/graphql';
+const GET_PRODUCT_QUERY = `
+  query GetProduct($id: ID!) {
+    product(id: $id) {
+      id
+      name
+      description
+      price
+      category
+      imageUrl
+      stock
+      createdAt
+    }
+  }
+`;
 
 export default function ProductPage() {
   const router = useRouter();
   const { cart } = useContext(CartContext) as any;
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<Product | null>(null);
   useEffect(() => {
     if (!router.query.id) return;
 
     setProduct(null);
 
-    fetch(GRAPHQL_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `
-          query GetProduct($id: ID!) {
-            product(id: $id) {
-              id
-              name
-              description
-              price
-              category
-              imageUrl
-              stock
-              createdAt
-            }
-          }
-        `,
-        variables: { id: router.query.id },
-      }),
-    })
-      .then(res => res.json())
+    fetchGraphQL<{ product: Product | null }>(GET_PRODUCT_QUERY, { id: router.query.id })
       .then(data => {
         console.log('product loaded:', data);
-        setProduct(data.data.product);
+        setProduct(data.product);
+      })
+      .catch(err => {
+        console.error('failed to load product:', err);
       });
   }, [router.query.id]);
 

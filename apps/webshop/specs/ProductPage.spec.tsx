@@ -28,6 +28,7 @@ function renderProductPage(cartValue: any) {
 }
 
 const productResponse = (id: string) => ({
+  ok: true,
   json: async () => ({
     data: {
       product: {
@@ -137,6 +138,20 @@ it('shows a loading state while refetching after an id change, instead of stale 
     await Promise.resolve();
   });
   await waitFor(() => expect(getByText('Product 4')).toBeTruthy());
+});
+
+it('stays on the loading state without crashing when the request fails', async () => {
+  (global.fetch as jest.Mock).mockRejectedValue(new Error('network down'));
+  const cartValue = { cart: [], addToCart: jest.fn(), totalItems: 0 };
+  const { getByText, queryByText } = renderProductPage(cartValue);
+
+  await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+  await act(async () => {
+    await Promise.resolve();
+  });
+
+  expect(getByText('Loading...')).toBeTruthy();
+  expect(queryByText('Add to cart')).toBeFalsy();
 });
 
 it('renders "Add to cart" as an accessible button and adds the loaded product to the cart', async () => {

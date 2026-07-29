@@ -24,6 +24,8 @@ To run both the frontend and backend:
 npm run dev
 ```
 
+By default the webshop talks to the GraphQL API at `http://localhost:4000/graphql`. To point it at a different address, copy `apps/webshop/.env.local.example` to `apps/webshop/.env.local` and set `NEXT_PUBLIC_GRAPHQL_URL`.
+
 ### Running Tests
 
 ```bash
