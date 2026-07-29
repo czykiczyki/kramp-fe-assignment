@@ -67,8 +67,8 @@ export default function SearchPage() {
           <section key={category} className={styles.category}>
             <h2 className={styles.categoryTitle}>{category}</h2>
             <div className={styles.grid}>
-              {grouped[category].map((product, index) => (
-                <ProductCard key={index} product={product} />
+              {grouped[category].map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </section>

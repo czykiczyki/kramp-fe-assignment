@@ -34,4 +34,24 @@ describe('SearchDialog', () => {
     fireEvent.click(getByRole('link', { name: /Adjustable Wrench/ }));
     expect(onSelect).toHaveBeenCalledWith('2');
   });
+
+  it('preserves the DOM node for a result across a reorder (stable key)', () => {
+    const first = [
+      { id: '1', name: 'Heavy Duty Hammer', price: 18.99 },
+      { id: '2', name: 'Adjustable Wrench', price: 22.75 },
+    ];
+    const { rerender, getByRole } = render(
+      <SearchDialog results={first} onSelect={jest.fn()} />
+    );
+    const wrenchBefore = getByRole('link', { name: /Adjustable Wrench/ });
+
+    const reordered = [
+      { id: '2', name: 'Adjustable Wrench', price: 22.75 },
+      { id: '1', name: 'Heavy Duty Hammer', price: 18.99 },
+    ];
+    rerender(<SearchDialog results={reordered} onSelect={jest.fn()} />);
+    const wrenchAfter = getByRole('link', { name: /Adjustable Wrench/ });
+
+    expect(wrenchAfter).toBe(wrenchBefore);
+  });
 });
