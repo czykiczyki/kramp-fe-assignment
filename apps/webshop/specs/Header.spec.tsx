@@ -105,4 +105,62 @@ describe('Header search debounce', () => {
     const body = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
     expect(body.variables.q).toBe('hammer');
   });
+
+  it('ignores a stale response that resolves after a newer one', async () => {
+    function createDeferred<T>() {
+      let resolve!: (value: T) => void;
+      const promise = new Promise<T>(res => {
+        resolve = res;
+      });
+      return { promise, resolve };
+    }
+
+    const first = createDeferred<any>(); // response for the earlier query "ha"
+    const second = createDeferred<any>(); // response for the newer query "hammer"
+
+    (global.fetch as jest.Mock)
+      .mockImplementationOnce(() => first.promise)
+      .mockImplementationOnce(() => second.promise);
+
+    const { getByPlaceholderText, queryByText } = renderHeader();
+    const input = getByPlaceholderText('Search products...');
+
+    fireEvent.change(input, { target: { value: 'ha' } });
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
+
+    fireEvent.change(input, { target: { value: 'hammer' } });
+    act(() => {
+      jest.advanceTimersByTime(300);
+    });
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
+
+    // The newer request ("hammer") resolves first.
+    await act(async () => {
+      second.resolve({
+        json: async () => ({
+          data: { searchProducts: [{ id: '2', name: 'Hammer Drill', price: 59 }] },
+        }),
+      });
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(queryByText('Hammer Drill')).toBeTruthy());
+
+    // The older request ("ha") resolves later — its response must be ignored.
+    await act(async () => {
+      first.resolve({
+        json: async () => ({
+          data: { searchProducts: [{ id: '3', name: 'Hand Saw', price: 12 }] },
+        }),
+      });
+      await Promise.resolve();
+    });
+
+    await waitFor(() => {
+      expect(queryByText('Hammer Drill')).toBeTruthy();
+      expect(queryByText('Hand Saw')).toBeFalsy();
+    });
+  });
 });

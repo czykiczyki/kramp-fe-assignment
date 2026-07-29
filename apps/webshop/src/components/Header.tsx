@@ -28,6 +28,8 @@ export function Header() {
       return;
     }
 
+    let ignore = false;
+
     fetch(GRAPHQL_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -50,8 +52,14 @@ export function Header() {
     })
       .then(res => res.json())
       .then(data => {
-        setResults(data.data.searchProducts.slice(0, 5));
+        if (!ignore) {
+          setResults(data.data.searchProducts.slice(0, 5));
+        }
       });
+
+    return () => {
+      ignore = true;
+    };
   }, [debouncedQuery]);
 
   useEffect(() => {
