@@ -75,8 +75,8 @@ export default function HomePage({ featured, timestamp }: HomePageProps) {
           </p>
         </div>
         <div className={styles.grid}>
-          {featured.map((product, index) => (
-            <ProductCard key={index} product={product} />
+          {featured.map((product) => (
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
