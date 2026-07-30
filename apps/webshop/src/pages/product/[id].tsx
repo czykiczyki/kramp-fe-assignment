@@ -1,8 +1,9 @@
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
-import { CartContext } from '../_app';
+import { useEffect, useState } from 'react';
+import { useCartContext } from '../_app';
 import { fetchGraphQL } from '../../utils/fetchGraphQL';
 import { Product } from '../../types';
+import { GetProductResponse } from '../../types/graphql';
 import styles from './[id].module.css';
 
 const GET_PRODUCT_QUERY = `
@@ -22,14 +23,14 @@ const GET_PRODUCT_QUERY = `
 
 export default function ProductPage() {
   const router = useRouter();
-  const { cart } = useContext(CartContext) as any;
+  const { cart } = useCartContext();
   const [product, setProduct] = useState<Product | null>(null);
   useEffect(() => {
     if (!router.query.id) return;
 
     setProduct(null);
 
-    fetchGraphQL<{ product: Product | null }>(GET_PRODUCT_QUERY, { id: router.query.id })
+    fetchGraphQL<GetProductResponse>(GET_PRODUCT_QUERY, { id: router.query.id })
       .then(data => {
         console.log('product loaded:', data);
         setProduct(data.product);

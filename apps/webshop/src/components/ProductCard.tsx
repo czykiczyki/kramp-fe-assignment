@@ -1,8 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
+import { Product } from '../types';
 import styles from './ProductCard.module.css';
 
-const ProductCard: React.FC<any> = ({ product, onAddToCart }) => {
+interface ProductCardProps {
+  product: Product;
+  onAddToCart?: () => void;
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
   return (
     <div
       className={styles.card}
@@ -24,10 +30,6 @@ const ProductCard: React.FC<any> = ({ product, onAddToCart }) => {
       </div>
     </div>
   );
-};
-
-(ProductCard as any).defaultProps = {
-  onAddToCart: () => {},
 };
 
 export default ProductCard;

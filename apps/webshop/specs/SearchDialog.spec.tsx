@@ -12,8 +12,8 @@ jest.mock('next/link', () => ({
 }));
 
 const results = [
-  { id: '1', name: 'Heavy Duty Hammer', price: 18.99 },
-  { id: '2', name: 'Adjustable Wrench', price: 22.75 },
+  { id: '1', name: 'Heavy Duty Hammer', price: 18.99, imageUrl: '', description: '', stock: 1, createdAt: '' },
+  { id: '2', name: 'Adjustable Wrench', price: 22.75, imageUrl: '', description: '', stock: 1, createdAt: '' },
 ];
 
 describe('SearchDialog', () => {
@@ -37,8 +37,8 @@ describe('SearchDialog', () => {
 
   it('preserves the DOM node for a result across a reorder (stable key)', () => {
     const first = [
-      { id: '1', name: 'Heavy Duty Hammer', price: 18.99 },
-      { id: '2', name: 'Adjustable Wrench', price: 22.75 },
+      { id: '1', name: 'Heavy Duty Hammer', price: 18.99, imageUrl: '', description: '', stock: 1, createdAt: '' },
+      { id: '2', name: 'Adjustable Wrench', price: 22.75, imageUrl: '', description: '', stock: 1, createdAt: '' },
     ];
     const { rerender, getByRole } = render(
       <SearchDialog results={first} onSelect={jest.fn()} />
@@ -46,8 +46,8 @@ describe('SearchDialog', () => {
     const wrenchBefore = getByRole('link', { name: /Adjustable Wrench/ });
 
     const reordered = [
-      { id: '2', name: 'Adjustable Wrench', price: 22.75 },
-      { id: '1', name: 'Heavy Duty Hammer', price: 18.99 },
+      { id: '2', name: 'Adjustable Wrench', price: 22.75, imageUrl: '', description: '', stock: 1, createdAt: '' },
+      { id: '1', name: 'Heavy Duty Hammer', price: 18.99, imageUrl: '', description: '', stock: 1, createdAt: '' },
     ];
     rerender(<SearchDialog results={reordered} onSelect={jest.fn()} />);
     const wrenchAfter = getByRole('link', { name: /Adjustable Wrench/ });

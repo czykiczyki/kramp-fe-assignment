@@ -5,9 +5,11 @@ import { CartContext } from '../src/pages/_app';
 
 // Avoid pulling in the real _app.tsx (and its useCart -> uuid ESM-only import,
 // which Jest's transform doesn't handle) just to get the CartContext reference.
-jest.mock('../src/pages/_app', () => ({
-  CartContext: require('react').createContext(undefined),
-}));
+jest.mock('../src/pages/_app', () => {
+  const { createContext, useContext } = require('react');
+  const CartContext = createContext(undefined);
+  return { CartContext, useCartContext: () => useContext(CartContext) };
+});
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
@@ -23,7 +25,16 @@ jest.mock('next/link', () => ({
   default: ({ children, href }: any) => <a href={href}>{children}</a>,
 }));
 
-const mockCartValue = { cart: { totalItems: 0 } };
+const mockCartValue = {
+  cart: {
+    cart: [],
+    addToCart: jest.fn(),
+    removeFromCart: jest.fn(),
+    clearCart: jest.fn(),
+    totalItems: 0,
+    totalPrice: 0,
+  },
+};
 
 function renderHeader() {
   return render(

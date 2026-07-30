@@ -4,6 +4,7 @@ import { groupBy } from '../utils/groupBy';
 import ProductCard from '../components/ProductCard';
 import { fetchGraphQL } from '../utils/fetchGraphQL';
 import { Product } from '../types';
+import { SearchProductsResponse } from '../types/graphql';
 import styles from './search.module.css';
 
 const SEARCH_PRODUCTS_QUERY = `
@@ -32,7 +33,7 @@ export default function SearchPage() {
 
     setIsLoading(true);
 
-    fetchGraphQL<{ searchProducts: Product[] }>(SEARCH_PRODUCTS_QUERY, { q })
+    fetchGraphQL<SearchProductsResponse>(SEARCH_PRODUCTS_QUERY, { q })
       .then(data => {
         console.log('search results:', data);
         setResults(data.searchProducts);

@@ -2,6 +2,7 @@ import { GetServerSideProps } from 'next';
 import ProductCard from '../components/ProductCard';
 import { fetchGraphQL } from '../utils/fetchGraphQL';
 import { Product } from '../types';
+import { GetProductResponse } from '../types/graphql';
 import styles from './index.module.css';
 
 const GET_PRODUCT_QUERY = `
@@ -25,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   const results = await Promise.all(
     FEATURED_IDS.map(async (id): Promise<Product | null> => {
       try {
-        const data = await fetchGraphQL<{ product: Product | null }>(GET_PRODUCT_QUERY, { id });
+        const data = await fetchGraphQL<GetProductResponse>(GET_PRODUCT_QUERY, { id });
         return data.product;
       } catch (e) {
         return null;
