@@ -73,4 +73,28 @@ describe('getServerSideProps', () => {
 
     expect(featuredIds).toEqual(['1', '11', '17']);
   });
+
+  it('dispatches all 4 product requests concurrently, not one at a time', async () => {
+    const { getServerSideProps } = require('../src/pages/index');
+    const deferreds: Record<string, (value: unknown) => void> = {};
+    global.fetch = jest.fn().mockImplementation((_url: string, init: any) => {
+      const { variables } = JSON.parse(init.body);
+      return new Promise(resolve => {
+        deferreds[variables.id] = resolve;
+      });
+    }) as jest.Mock;
+
+    const resultPromise = getServerSideProps({} as any);
+
+    // Let pending microtasks run without resolving any request.
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(global.fetch).toHaveBeenCalledTimes(4);
+
+    ['1', '4', '11', '17'].forEach(id => deferreds[id](productResponse(id)));
+    const result = await resultPromise;
+
+    expect(result.props.featured.map((p: any) => p.id)).toEqual(['1', '4', '11', '17']);
+  });
 });
