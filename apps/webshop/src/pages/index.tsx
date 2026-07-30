@@ -21,16 +21,19 @@ const GET_PRODUCT_QUERY = `
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const FEATURED_IDS = ['1', '4', '11', '17'];
-  const featured: Product[] = [];
 
-  for (const id of FEATURED_IDS) {
-    try {
-      const data = await fetchGraphQL<{ product: Product | null }>(GET_PRODUCT_QUERY, { id });
-      if (data.product) {
-        featured.push(data.product);
+  const results = await Promise.all(
+    FEATURED_IDS.map(async (id): Promise<Product | null> => {
+      try {
+        const data = await fetchGraphQL<{ product: Product | null }>(GET_PRODUCT_QUERY, { id });
+        return data.product;
+      } catch (e) {
+        return null;
       }
-    } catch (e) {}
-  }
+    })
+  );
+
+  const featured = results.filter((p): p is Product => p !== null);
 
   return {
     props: {
