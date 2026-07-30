@@ -1,8 +1,9 @@
 import Link from 'next/link';
+import { SearchResult } from '../types';
 import styles from './SearchDialog.module.css';
 
 interface SearchDialogProps {
-  results: any[];
+  results: SearchResult[];
   onSelect: (id: string) => void;
 }
 

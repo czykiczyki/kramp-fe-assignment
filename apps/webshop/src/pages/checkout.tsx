@@ -1,10 +1,10 @@
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { CartContext } from './_app';
+import { useCartContext } from './_app';
 import styles from './checkout.module.css';
 
 export default function CheckoutPage() {
-  const { cart } = useContext(CartContext) as any;
+  const { cart } = useCartContext();
   const [confirmed, setConfirmed] = useState(false);
 
   const handlePlaceOrder = () => {
@@ -23,11 +23,11 @@ export default function CheckoutPage() {
   }
 
   const items = cart.cart || [];
-  const subtotals = items.map((item: any) => item.price * item.quantity);
+  const subtotals = items.map((item) => item.price * item.quantity);
   const subtotal = subtotals.reduce((a: number, b: number) => a + b, 0);
   const tax = subtotals.reduce((a: number, b: number) => a + b * 0.21, 0);
   const shipping = items.reduce(
-    (acc: number, item: any) => acc + (item.quantity > 5 ? 0 : 4.95),
+    (acc, item) => acc + (item.quantity > 5 ? 0 : 4.95),
     0
   );
   const total = subtotal + tax + shipping;
@@ -50,7 +50,7 @@ export default function CheckoutPage() {
             }}
           >
             <div className={styles.items}>
-              {items.map((item: any, index: number) => (
+              {items.map((item, index) => (
                 <div key={index} className={styles.item}>
                   <span className={styles.itemName}>{item.name}</span>
                   <span className={styles.itemQty}>×{item.quantity}</span>

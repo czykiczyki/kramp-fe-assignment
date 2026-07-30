@@ -16,6 +16,6 @@ export interface CartItem {
   quantity: number;
 }
 
-export type SearchResult = any;
+export type SearchResult = Omit<Product, 'category'>;
 
 export type ProductCategory = 'Tools' | 'Fasteners' | 'Safety Equipment' | 'Power Tools';

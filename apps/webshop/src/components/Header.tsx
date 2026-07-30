@@ -1,13 +1,14 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import _ from 'lodash';
-import { CartContext } from '../pages/_app';
+import { useCartContext } from '../pages/_app';
 import { SearchDialog } from './SearchDialog';
 import { CartIcon } from './cartIcon';
 import { useDebounce } from '../hooks/useDebounce';
 import { fetchGraphQL } from '../utils/fetchGraphQL';
-import { Product } from '../types';
+import { SearchResult } from '../types';
+import { SearchResponse } from '../types/graphql';
 import styles from './Header.module.css';
 
 const SEARCH_QUERY = `
@@ -26,9 +27,9 @@ const SEARCH_QUERY = `
 
 export function Header() {
   const router = useRouter();
-  const { cart } = useContext(CartContext);
+  const { cart } = useCartContext();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<any[]>([]);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const debouncedQuery = useDebounce(query, 300);
 
@@ -44,7 +45,7 @@ export function Header() {
 
     let ignore = false;
 
-    fetchGraphQL<{ searchProducts: Omit<Product, 'category'>[] }>(SEARCH_QUERY, {
+    fetchGraphQL<SearchResponse>(SEARCH_QUERY, {
       q: debouncedQuery,
     })
       .then(data => {
