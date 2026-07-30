@@ -63,10 +63,21 @@
   margin-bottom: 24px;
 }
 
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
 .total {
   display: flex;
   justify-content: space-between;
   font-size: 18px;
+  padding-top: 12px;
+  margin-top: 4px;
+  border-top: 1px solid #e0e0e0;
 }
 
 .actions {

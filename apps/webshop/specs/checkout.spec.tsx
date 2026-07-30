@@ -45,6 +45,38 @@ describe('CheckoutPage', () => {
     expect(button.closest('form')).toBeTruthy();
   });
 
+  it('shows subtotal, VAT, shipping and total in the order summary', () => {
+    // Two distinct line-item prices so no line total coincides with any
+    // summary value (avoids ambiguous text matches in the assertions below).
+    const cartValue = {
+      cart: [
+        { productId: '1', name: 'Hammer', price: 10, quantity: 1 },
+        { productId: '2', name: 'Wrench', price: 15, quantity: 1 },
+      ],
+      clearCart: jest.fn(),
+    };
+    const { getByText } = renderCheckout(cartValue);
+
+    expect(getByText('Subtotal')).toBeTruthy();
+    expect(getByText('€25.00')).toBeTruthy(); // 10 + 15
+    expect(getByText('VAT (21%)')).toBeTruthy();
+    expect(getByText('€5.25')).toBeTruthy(); // 25 × 0.21
+    expect(getByText('Shipping')).toBeTruthy();
+    expect(getByText('€9.90')).toBeTruthy(); // two line items, each quantity 1 ≤ 5 => 4.95 + 4.95
+    expect(getByText('Total')).toBeTruthy();
+    expect(getByText('€40.15')).toBeTruthy(); // 25 + 5.25 + 9.90
+  });
+
+  it('reflects the existing per-item shipping threshold (quantity > 5 => free) in the summary', () => {
+    const cartValue = {
+      cart: [{ productId: '1', name: 'Hammer', price: 10, quantity: 6 }],
+      clearCart: jest.fn(),
+    };
+    const { getByText } = renderCheckout(cartValue);
+
+    expect(getByText('€0.00')).toBeTruthy(); // shipping row for quantity > 5
+  });
+
   it('clears the cart and shows the confirmation screen when the order is placed', async () => {
     const cartValue = {
       cart: [{ productId: '1', name: 'Hammer', price: 18.99, quantity: 2 }],
