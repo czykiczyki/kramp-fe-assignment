@@ -46,6 +46,24 @@ afterEach(() => {
   jest.restoreAllMocks();
 });
 
+it('removes the outside-click listener on unmount', () => {
+  const addSpy = jest.spyOn(document, 'addEventListener');
+  const removeSpy = jest.spyOn(document, 'removeEventListener');
+
+  const { unmount } = renderHeader();
+
+  const clickCall = addSpy.mock.calls.find(([type]) => type === 'click');
+  expect(clickCall).toBeTruthy();
+  const handler = clickCall![1];
+
+  unmount();
+
+  expect(removeSpy).toHaveBeenCalledWith('click', handler);
+
+  addSpy.mockRestore();
+  removeSpy.mockRestore();
+});
+
 describe('Header search debounce', () => {
   it('sends exactly one request after a burst of rapid changes, once the delay elapses', async () => {
     const { getByPlaceholderText } = renderHeader();
